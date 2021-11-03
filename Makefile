@@ -15,7 +15,7 @@ vet: test
 	go vet ./...
 
 artictl: build
-	go build -o artictl ./cmd/artictl/main.go
+	go build -o artictl ./cmd/artictl
 
 clean:
 	rm -f artictl
