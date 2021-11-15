@@ -1,0 +1,11 @@
+currentContext: "test1"
+contexts:
+  test1:
+    auth:
+      token: "testtoken"
+    endpoint: https:/central.artipie.com
+  test2:
+    auth:
+      username: test
+      password: testpw
+    endpoint: http://artipie.local/artipie
