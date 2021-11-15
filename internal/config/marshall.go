@@ -20,7 +20,7 @@ func (c *CtlContext) UnmarshalYAML(value *yaml.Node) error {
 	} else if len(content) == 4 && content[0].Value == "username" && content[2].Value == "password" {
 		c.Auth = new(AuthBasic)
 	} else {
-		return &errInvalidAuth{}
+		return ErrInvalidAuth
 	}
 	err := obj.Auth.Decode(c.Auth)
 	return err

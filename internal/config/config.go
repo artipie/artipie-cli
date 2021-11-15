@@ -21,17 +21,19 @@ type CtlContext struct {
 	Endpoint string `yaml:"endpoint"`
 }
 
-type errConfigNotFound struct{ paths []string }
+// ErrConfigNotFound occurs when config files was not found on specified paths.
+type ErrConfigNotFound struct{ Paths []string }
 
-func (e *errConfigNotFound) Error() string {
+func (e *ErrConfigNotFound) Error() string {
 	return fmt.Sprintf("file not found, paths: %v",
-		strings.Join(e.paths, ", "))
+		strings.Join(e.Paths, ", "))
 }
 
-type errConfigFieldEmpty struct{ field string }
+// ErrConfigFieldEmpty occurs when mandatory fields of config is empty.
+type ErrConfigFieldEmpty struct{ Field string }
 
-func (e *errConfigFieldEmpty) Error() string {
-	return fmt.Sprintf("config field %s is empty", e.field)
+func (e *ErrConfigFieldEmpty) Error() string {
+	return fmt.Sprintf("config field %s is empty", e.Field)
 }
 
 // FromFiles parses config from first existent of the specifed files.
@@ -46,7 +48,7 @@ func (c *ArtiCtlConfig) FromFiles(paths ...string) error {
 		}
 		return c.parse(p)
 	}
-	return &errConfigNotFound{paths}
+	return &ErrConfigNotFound{paths}
 }
 
 func (c *ArtiCtlConfig) parse(fileName string) error {
@@ -64,10 +66,10 @@ func (c *ArtiCtlConfig) parse(fileName string) error {
 func (c *ArtiCtlConfig) validate() error {
 	var me *multierror.Error
 	if c.CurrentContext == "" {
-		me = multierror.Append(me, &errConfigFieldEmpty{"currentContext"})
+		me = multierror.Append(me, &ErrConfigFieldEmpty{"currentContext"})
 	}
 	if len(c.Contexts) == 0 {
-		me = multierror.Append(me, &errConfigFieldEmpty{"contexts"})
+		me = multierror.Append(me, &ErrConfigFieldEmpty{"contexts"})
 	}
 	for k, v := range c.Contexts {
 		err := v.validate()
@@ -82,7 +84,7 @@ func (c *ArtiCtlConfig) validate() error {
 func (c *CtlContext) validate() error {
 	var me *multierror.Error
 	if c.Endpoint == "" {
-		me = multierror.Append(me, &errConfigFieldEmpty{"endpoint"})
+		me = multierror.Append(me, &ErrConfigFieldEmpty{"endpoint"})
 	}
 	err := c.Auth.validate()
 	if err != nil {
@@ -107,5 +109,5 @@ func (c *CtlContext) ContextFromInput(user, password, token, endpoint string) er
 	if user == "" && password == "" && token == "" {
 		return nil
 	}
-	return &errInvalidAuth{}
+	return ErrInvalidAuth
 }
