@@ -1,11 +1,14 @@
 package config
 
-import "errors"
+import (
+	"errors"
+	"net/http"
+)
 
 // Auth represents authentification options.
-// TODO Auth options should generate valid header for request
 type Auth interface {
 	validate() error
+	SetAuthHeader(req *http.Request)
 }
 
 // ErrInvalidAuth occurs when authentification options is invalid.
@@ -17,7 +20,7 @@ type AuthBasic struct {
 	Password string `yaml:"password"`
 }
 
-func (a AuthBasic) validate() error {
+func (a *AuthBasic) validate() error {
 	if a.UserName == "" {
 		return &ErrConfigFieldEmpty{"username"}
 	}
@@ -27,14 +30,23 @@ func (a AuthBasic) validate() error {
 	return nil
 }
 
+func (a *AuthBasic) SetAuthHeader(req *http.Request) {
+	req.SetBasicAuth(a.UserName, a.Password)
+}
+
 // AuthToken is for authentification via token.
 type AuthToken struct {
 	Token string `yaml:"token"`
 }
 
-func (a AuthToken) validate() error {
+func (a *AuthToken) validate() error {
 	if a.Token == "" {
 		return &ErrConfigFieldEmpty{"token"}
 	}
 	return nil
+}
+
+func (a *AuthToken) SetAuthHeader(req *http.Request) {
+	var bearer = "Bearer " + a.Token
+	req.Header.Add("Authorization", bearer)
 }
