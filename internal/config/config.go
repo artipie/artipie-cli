@@ -99,11 +99,11 @@ func (c *CtlContext) ContextFromInput(user, password, token, endpoint string) er
 		c.Endpoint = endpoint
 	}
 	if token != "" && user == "" && password == "" {
-		c.Auth = AuthToken{token}
+		c.Auth = &AuthToken{token}
 		return nil
 	}
 	if user != "" && password != "" && token == "" {
-		c.Auth = AuthBasic{user, password}
+		c.Auth = &AuthBasic{user, password}
 		return nil
 	}
 	if user == "" && password == "" && token == "" {
